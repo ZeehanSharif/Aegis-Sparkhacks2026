@@ -1,7 +1,25 @@
 import Link from "next/link";
 import Shell from "@/components/Shell";
 
-export default function EndPage() {
+type SearchParams = { case?: string; decision?: string; audit?: string };
+
+function prettyDecision(d?: string) {
+  if (!d) return "—";
+  if (d === "approve") return "Approved";
+  if (d === "challenge") return "Challenged";
+  if (d === "override") return "Overridden";
+  return d;
+}
+
+export default function EndPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const caseId = searchParams.case ?? "—";
+  const decision = prettyDecision(searchParams.decision);
+  const audit = searchParams.audit ?? "—";
+
   return (
     <Shell>
       <div className="grid min-h-[70dvh] place-items-center">
@@ -9,7 +27,17 @@ export default function EndPage() {
           <div className="mb-2 text-lg font-bold">Conclusion</div>
 
           <div className="rounded-2xl border border-neutral-300 bg-neutral-50 p-4 text-sm text-neutral-800">
-            Outcome placeholder: case result + operator profile summary.
+            <div className="font-bold">Case #{caseId}</div>
+            <div className="mt-2">
+              Final action: <span className="font-bold">{decision}</span>
+            </div>
+            <div className="mt-2">
+              Audit Heat: <span className="font-bold">{audit}/3</span>
+            </div>
+            <div className="mt-3 text-neutral-600">
+              Next: generate an “internal memo” line based on decision + audit
+              heat.
+            </div>
           </div>
 
           <div className="mt-5 flex flex-wrap gap-2">
