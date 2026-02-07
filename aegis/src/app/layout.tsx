@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CIVIC — Integrated Case Evaluation System",
+  title: "AEGIS — Algorithmic Evaluation & Governance Intelligence System",
   description:
-    "Civic Integrated Verification and Intelligence Computation. Analyst workstation for case evaluation and adjudication.",
+    "Level 3 analyst workstation. Algorithmic case evaluation and adjudication. Classification: Restricted.",
 };
 
 export default function RootLayout({

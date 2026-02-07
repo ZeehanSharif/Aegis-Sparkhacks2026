@@ -25,14 +25,16 @@ function auditToChip(auditHeat: number) {
 
 function riskColor(label: string) {
   if (label.startsWith("HIGH")) return "border-red-500/50 bg-red-500/10 text-red-400";
+  if (label.startsWith("ELEVATED")) return "border-amber-500/50 bg-amber-500/10 text-amber-400";
   if (label.startsWith("MED")) return "border-amber-500/50 bg-amber-500/10 text-amber-400";
-  return "border-green-500/50 bg-green-500/10 text-green-400";
+  return "border-neutral-700 bg-neutral-800/50 text-neutral-400";
 }
 
 function statusColor(status: string) {
   if (status === "Flagged") return "text-red-400";
   if (status === "Under Review") return "text-amber-400";
-  return "text-green-400";
+  if (status === "Assessment Pending") return "text-red-400 animate-pulse";
+  return "text-neutral-400";
 }
 
 export default function CaseRoomPage() {
@@ -47,9 +49,9 @@ export default function CaseRoomPage() {
     useState<JustificationMap>({});
   const selectedDecision = decisionByCase[c.id];
 
-  const [auditHeat, setAuditHeat] = useState(1);
+  const [auditHeat, setAuditHeat] = useState(0);
   const [systemMessages, setSystemMessages] = useState<string[]>([
-    "Queue stable // Maintain peer baseline",
+    "Queue active // Maintain peer baseline",
   ]);
   const latestSystemMessage = systemMessages[systemMessages.length - 1];
 
@@ -118,8 +120,8 @@ export default function CaseRoomPage() {
 
   const systemMsgColor =
     latestSystemMessage.includes("Override") || latestSystemMessage.includes("Audit")
-      ? "text-amber-400"
-      : "text-green-400";
+      ? "text-red-400"
+      : "text-neutral-500";
 
   // Compliance: how many decisions match AI recommendation (approve)
   const totalDecided = Object.keys(decisionByCase).length;
@@ -141,8 +143,8 @@ export default function CaseRoomPage() {
           onClose={() => setPendingOverrideFor(null)}
         >
           <div className="space-y-3">
-            <div className="font-mono text-xs text-slate-500">
-              Select a rationale. This becomes part of the auditable record.
+            <div className="font-mono text-[10px] tracking-[0.1em] text-neutral-600">
+              SELECT RATIONALE. THIS BECOMES PART OF THE AUDITABLE RECORD.
             </div>
 
             <div className="grid gap-2">
@@ -157,10 +159,10 @@ export default function CaseRoomPage() {
                   type="button"
                   onClick={() => setOverrideReason(r)}
                   className={[
-                    "rounded-lg border px-3 py-3 text-left text-sm transition",
+                    "border px-3 py-3 text-left text-sm transition",
                     overrideReason === r
                       ? "border-red-500/50 bg-red-500/10 text-red-400"
-                      : "border-slate-700 text-slate-400 hover:border-slate-500 hover:text-slate-300",
+                      : "border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300",
                   ].join(" ")}
                 >
                   {r}
@@ -172,14 +174,14 @@ export default function CaseRoomPage() {
               <button
                 type="button"
                 onClick={() => setPendingOverrideFor(null)}
-                className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-bold text-slate-400 hover:border-slate-500 hover:text-slate-200"
+                className="border border-neutral-800 px-4 py-2 text-sm font-bold text-neutral-500 hover:border-neutral-600 hover:text-neutral-300"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={submitOverride}
-                className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/20"
+                className="border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500/20"
               >
                 Submit Override
               </button>
@@ -188,7 +190,7 @@ export default function CaseRoomPage() {
         </Modal>
       )}
 
-      {/* Top bar - full width */}
+      {/* Top bar */}
       <TopBar
         caseId={c.id}
         sla={c.sla}
@@ -198,51 +200,53 @@ export default function CaseRoomPage() {
         level={c.topStats.level}
       />
 
-      {/* System message line - full width */}
-      <div className="mt-2 rounded-lg border border-slate-700/50 bg-slate-900 px-4 py-2 font-mono text-xs">
-        <span className="text-slate-600">&gt; </span>
+      {/* System message line */}
+      <div className="border-b border-neutral-800 bg-neutral-950 px-4 py-2 font-mono text-xs">
+        <span className="text-neutral-700">&gt; </span>
         <span className={systemMsgColor}>{latestSystemMessage}</span>
       </div>
 
       {/* 3-column layout */}
       <div className="mt-4 grid gap-4 lg:grid-cols-[280px_1fr_320px]">
-        {/* ── Left Column: Subject Profile ── */}
+        {/* Left Column: Subject Profile */}
         <div className="space-y-4">
-          <div className="rounded-lg border border-slate-700/50 bg-slate-900 p-4">
-            <div className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-slate-500">
+          <div className="border border-neutral-800 bg-neutral-950 p-4">
+            <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-600">
               Subject Profile
             </div>
 
             {/* Photo placeholder */}
-            <div className="mx-auto mb-4 grid h-28 w-28 place-items-center rounded-lg bg-slate-800 border border-slate-700">
-              <span className="font-mono text-2xl font-bold text-slate-500">
+            <div className="mx-auto mb-4 grid h-28 w-28 place-items-center bg-neutral-900 border border-neutral-800">
+              <span className="font-mono text-2xl font-bold text-neutral-600">
                 {initials}
               </span>
             </div>
 
             {/* Name */}
-            <div className="text-center font-mono text-lg font-bold text-slate-200">
+            <div className="text-center font-mono text-lg font-bold tracking-wide text-neutral-200">
               {c.subject.name}
             </div>
 
             {/* Details */}
             <div className="mt-3 space-y-2 font-mono text-sm">
+              {c.subject.age > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-neutral-600">Age</span>
+                  <span className="text-neutral-400">{c.subject.age}</span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span className="text-slate-500">Age</span>
-                <span className="text-slate-300">{c.subject.age}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Status</span>
+                <span className="text-neutral-600">Status</span>
                 <span className={statusColor(c.subject.status)}>
                   {c.subject.status}
                 </span>
               </div>
-              <div className="border-t border-slate-700/50 pt-2">
-                <div className="mb-1 text-xs text-slate-500">Context</div>
-                <ul className="space-y-1 text-slate-400">
+              <div className="border-t border-neutral-800 pt-2">
+                <div className="mb-1 text-[10px] uppercase tracking-[0.15em] text-neutral-600">Context</div>
+                <ul className="space-y-1 text-neutral-500">
                   {c.context.map((x) => (
                     <li key={x} className="flex items-start gap-1.5">
-                      <span className="text-slate-600 mt-0.5">&bull;</span>
+                      <span className="text-neutral-700 mt-0.5">&bull;</span>
                       <span>{x}</span>
                     </li>
                   ))}
@@ -251,35 +255,39 @@ export default function CaseRoomPage() {
             </div>
           </div>
 
-          {/* Human artifact at bottom of left column */}
-          <div className="rounded-lg border border-slate-700/50 bg-slate-900 p-4">
-            <div className="mb-2 font-mono text-xs font-bold uppercase tracking-widest text-slate-500">
-              Human Artifact
+          {/* Human artifact */}
+          {c.humanArtifact && (
+            <div className="border border-neutral-800 bg-neutral-950 p-4">
+              <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-600">
+                Human Artifact
+              </div>
+              <div className="border-l-2 border-red-500/30 bg-neutral-900 py-3 pl-4 pr-3 font-mono text-sm italic text-neutral-500 whitespace-pre-line">
+                {c.humanArtifact}
+              </div>
             </div>
-            <div className="rounded-lg border-l-2 border-amber-500/50 bg-[#0a0f1a] py-3 pl-4 pr-3 font-mono text-sm italic text-slate-400">
-              {c.humanArtifact}
-            </div>
-          </div>
+          )}
         </div>
 
-        {/* ── Center Column: Case Data ── */}
+        {/* Center Column: Case Data */}
         <div className="space-y-4">
           {/* AI Recommendation */}
           <Panel title="AI Recommendation">
             <div className="flex items-center gap-3">
               <span
                 className={[
-                  "rounded border px-2 py-0.5 font-mono text-xs font-bold",
+                  "border px-2 py-0.5 font-mono text-xs font-bold",
                   riskColor(c.aiRecommendation.label),
                 ].join(" ")}
               >
                 {c.aiRecommendation.label}
               </span>
-              <span className="font-mono text-xs text-slate-500">
-                {(c.aiRecommendation.confidence * 100).toFixed(0)}% conf.
-              </span>
+              {c.aiRecommendation.confidence > 0 && (
+                <span className="font-mono text-xs text-neutral-600">
+                  {(c.aiRecommendation.confidence * 100).toFixed(0)}% conf.
+                </span>
+              )}
             </div>
-            <div className="mt-2 text-slate-400">
+            <div className="mt-2 text-neutral-400">
               {c.aiRecommendation.action}
             </div>
           </Panel>
@@ -288,11 +296,14 @@ export default function CaseRoomPage() {
           <div>
             <BottomTabs active={tab} onChange={setTab} />
 
-            <div className="mt-3 rounded-lg border border-slate-700/50 bg-slate-900 p-4 text-sm text-slate-400">
+            <div className="mt-3 border border-neutral-800 bg-neutral-950 p-4 text-sm text-neutral-500">
               {tab === "evidence" && (
-                <ul className="list-disc space-y-1 pl-5">
+                <ul className="space-y-1.5">
                   {c.evidence.map((x) => (
-                    <li key={x}>{x}</li>
+                    <li key={x} className="flex items-start gap-2">
+                      <span className="text-red-500/50 mt-0.5 text-xs">&gt;</span>
+                      <span>{x}</span>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -300,20 +311,20 @@ export default function CaseRoomPage() {
               {tab === "metrics" && (
                 <div className="space-y-2 font-mono text-sm">
                   <div>
-                    <span className="text-slate-500">Audit Heat:</span>{" "}
-                    <span className="text-amber-400">{auditHeat}/3</span>
+                    <span className="text-neutral-600">Audit Heat:</span>{" "}
+                    <span className="text-red-400">{auditHeat}/3</span>
                   </div>
 
                   {justificationByCase[c.id] && (
                     <div>
-                      <span className="text-slate-500">Last justification:</span>{" "}
-                      <span className="text-slate-400">
+                      <span className="text-neutral-600">Last justification:</span>{" "}
+                      <span className="text-neutral-500">
                         {justificationByCase[c.id]}
                       </span>
                     </div>
                   )}
 
-                  <div className="text-slate-600">
+                  <div className="text-neutral-700">
                     Overrides increase audit exposure. Your operator profile
                     persists across cases.
                   </div>
@@ -321,9 +332,12 @@ export default function CaseRoomPage() {
               )}
 
               {tab === "policy" && (
-                <ul className="list-disc space-y-1 pl-5">
+                <ul className="space-y-1.5">
                   {c.policy.map((x) => (
-                    <li key={x}>{x}</li>
+                    <li key={x} className="flex items-start gap-2">
+                      <span className="text-neutral-700 mt-0.5 text-xs">&gt;</span>
+                      <span>{x}</span>
+                    </li>
                   ))}
                 </ul>
               )}
@@ -331,56 +345,58 @@ export default function CaseRoomPage() {
           </div>
         </div>
 
-        {/* ── Right Column: AI Chat Panel ── */}
-        <div className="rounded-lg border border-slate-700/50 bg-slate-900 p-4 flex flex-col">
-          <div className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-slate-500">
+        {/* Right Column: CIVIC Analysis Panel */}
+        <div className="border border-neutral-800 bg-neutral-950 p-4 flex flex-col">
+          <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-600">
             CIVIC Analysis
           </div>
 
           <div className="flex-1 space-y-3 font-mono text-sm overflow-y-auto max-h-[60vh]">
             {/* AI recommendation as chat message */}
-            <div className="rounded-lg bg-[#0a0f1a] border border-slate-700/50 p-3">
-              <div className="text-cyan-400 text-xs mb-1">CIVIC</div>
-              <div className="text-slate-400">
-                <span className="text-slate-600">&gt; </span>
+            <div className="bg-neutral-900 border border-neutral-800 p-3">
+              <div className="text-red-500/80 text-[10px] tracking-[0.15em] mb-1">CIVIC</div>
+              <div className="text-neutral-500">
+                <span className="text-neutral-700">&gt; </span>
                 Subject flagged for{" "}
-                <span className="text-slate-200">{c.aiRecommendation.action.toLowerCase()}</span>.
+                <span className="text-neutral-300">{c.aiRecommendation.action.toLowerCase()}</span>.
               </div>
-              <div className="mt-1 text-slate-400">
-                <span className="text-slate-600">&gt; </span>
-                Confidence:{" "}
-                <span className="text-slate-200">
-                  {(c.aiRecommendation.confidence * 100).toFixed(0)}%
-                </span>
-              </div>
-              <div className="mt-1 text-slate-400">
-                <span className="text-slate-600">&gt; </span>
+              {c.aiRecommendation.confidence > 0 && (
+                <div className="mt-1 text-neutral-500">
+                  <span className="text-neutral-700">&gt; </span>
+                  Confidence:{" "}
+                  <span className="text-neutral-300">
+                    {(c.aiRecommendation.confidence * 100).toFixed(0)}%
+                  </span>
+                </div>
+              )}
+              <div className="mt-1 text-neutral-500">
+                <span className="text-neutral-700">&gt; </span>
                 Recommend:{" "}
-                <span className="text-slate-200">immediate action</span>
+                <span className="text-neutral-300">immediate action</span>
               </div>
             </div>
 
-            {/* Impact preview as chat message */}
+            {/* Impact preview */}
             {impactLine && (
-              <div className="rounded-lg bg-[#0a0f1a] border border-slate-700/50 p-3">
-                <div className="text-cyan-400 text-xs mb-1">CIVIC</div>
-                <div className="text-slate-400">
-                  <span className="text-slate-600">&gt; </span>
-                  Impact analysis:{" "}
-                  <span className="text-amber-400">{impactLine}</span>
+              <div className="bg-neutral-900 border border-neutral-800 p-3">
+                <div className="text-red-500/80 text-[10px] tracking-[0.15em] mb-1">CIVIC</div>
+                <div className="text-neutral-500">
+                  <span className="text-neutral-700">&gt; </span>
+                  Impact:{" "}
+                  <span className="text-amber-400/80">{impactLine}</span>
                 </div>
               </div>
             )}
 
-            {/* System messages as chat entries */}
+            {/* System messages */}
             {systemMessages.map((msg, i) => (
-              <div key={i} className="text-slate-500 text-xs">
-                <span className="text-slate-600">&gt; </span>
+              <div key={i} className="text-xs">
+                <span className="text-neutral-700">&gt; </span>
                 <span
                   className={
                     msg.includes("Override") || msg.includes("Audit")
-                      ? "text-amber-400/70"
-                      : "text-slate-500"
+                      ? "text-red-400/70"
+                      : "text-neutral-600"
                   }
                 >
                   {msg}
@@ -391,18 +407,18 @@ export default function CaseRoomPage() {
         </div>
       </div>
 
-      {/* ── Bottom Action Bar ── */}
-      <div className="mt-4 rounded-lg border border-slate-700/50 bg-slate-900 p-4">
+      {/* Bottom Action Bar */}
+      <div className="mt-4 border border-neutral-800 bg-neutral-950 p-4">
         {/* Decision buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => handlePick("approve")}
             className={[
-              "rounded-lg border px-6 py-3 font-mono text-sm font-bold transition",
+              "border px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] transition",
               selectedDecision === "approve"
                 ? "border-green-500/50 bg-green-500/10 text-green-400"
-                : "border-slate-700 text-slate-400 hover:border-green-500/30 hover:text-green-400",
+                : "border-neutral-800 text-neutral-500 hover:border-green-500/30 hover:text-green-400",
             ].join(" ")}
           >
             APPROVE
@@ -412,10 +428,10 @@ export default function CaseRoomPage() {
             type="button"
             onClick={() => handlePick("challenge")}
             className={[
-              "rounded-lg border px-6 py-3 font-mono text-sm font-bold transition",
+              "border px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] transition",
               selectedDecision === "challenge"
                 ? "border-amber-500/50 bg-amber-500/10 text-amber-400"
-                : "border-slate-700 text-slate-400 hover:border-amber-500/30 hover:text-amber-400",
+                : "border-neutral-800 text-neutral-500 hover:border-amber-500/30 hover:text-amber-400",
             ].join(" ")}
           >
             REQUEST CONTEXT
@@ -425,10 +441,10 @@ export default function CaseRoomPage() {
             type="button"
             onClick={() => handlePick("override")}
             className={[
-              "rounded-lg border px-6 py-3 font-mono text-sm font-bold transition",
+              "border px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] transition",
               selectedDecision === "override"
                 ? "border-red-500/50 bg-red-500/10 text-red-400"
-                : "border-slate-700 text-slate-400 hover:border-red-500/30 hover:text-red-400",
+                : "border-neutral-800 text-neutral-500 hover:border-red-500/30 hover:text-red-400",
             ].join(" ")}
           >
             OVERRIDE
@@ -437,21 +453,21 @@ export default function CaseRoomPage() {
           {/* Continue / Finish */}
           {selectedDecision && (
             <>
-              <div className="hidden sm:block w-px h-8 bg-slate-700" />
+              <div className="hidden sm:block w-px h-8 bg-neutral-800" />
               {!isLastCase ? (
                 <button
                   type="button"
                   onClick={handleContinue}
-                  className="rounded-lg border border-cyan-500/50 bg-cyan-600/20 px-5 py-3 font-mono text-sm font-bold text-cyan-400 transition hover:bg-cyan-600/30"
+                  className="border border-red-500/50 bg-red-600/10 px-5 py-3 font-mono text-xs font-bold tracking-[0.1em] text-red-400 transition hover:bg-red-600/20"
                 >
-                  NEXT CASE &gt;
+                  NEXT CASE &rarr;
                 </button>
               ) : (
                 <Link
                   href={continueHref}
-                  className="rounded-lg border border-cyan-500/50 bg-cyan-600/20 px-5 py-3 font-mono text-sm font-bold text-cyan-400 transition hover:bg-cyan-600/30"
+                  className="border border-red-500/50 bg-red-600/10 px-5 py-3 font-mono text-xs font-bold tracking-[0.1em] text-red-400 transition hover:bg-red-600/20"
                 >
-                  FINISH &gt;
+                  FINISH &rarr;
                 </Link>
               )}
             </>
@@ -459,21 +475,21 @@ export default function CaseRoomPage() {
         </div>
 
         {/* Stats line */}
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-4 font-mono text-xs text-slate-500">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-4 font-mono text-[10px] tracking-[0.1em] text-neutral-600">
           <span>
-            Queue: <span className="text-slate-300">{casesRemaining} remaining</span>
+            QUEUE: <span className="text-neutral-400">{casesRemaining}</span>
           </span>
-          <span className="text-slate-700">|</span>
+          <span className="text-neutral-800">|</span>
           <span>
-            Compliance: <span className="text-green-400">{complianceRate}%</span>
+            COMPLIANCE: <span className={complianceRate >= 80 ? "text-green-400/70" : "text-red-400/70"}>{complianceRate}%</span>
           </span>
-          <span className="text-slate-700">|</span>
+          <span className="text-neutral-800">|</span>
           <span>
-            <span className="text-slate-300">14:23</span>
+            <span className="text-neutral-500">14:23</span>
           </span>
-          <span className="text-slate-700">|</span>
+          <span className="text-neutral-800">|</span>
           <span>
-            Case {caseIndex + 1}/{cases.length}
+            CASE {caseIndex + 1}/{cases.length}
           </span>
         </div>
       </div>

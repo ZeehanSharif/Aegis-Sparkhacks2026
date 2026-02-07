@@ -14,7 +14,7 @@ export default function BottomTabs({
   onChange: (t: TabKey) => void;
 }) {
   return (
-    <div className="rounded-lg border border-slate-700/50 bg-slate-900 p-3">
+    <div className="border border-neutral-800 bg-neutral-950 p-3">
       <div className="flex flex-wrap gap-2">
         {tabs.map((t) => (
           <button
@@ -22,10 +22,10 @@ export default function BottomTabs({
             onClick={() => onChange(t.key)}
             type="button"
             className={[
-              "rounded-lg border px-3 py-2 font-mono text-sm font-semibold transition",
+              "border px-3 py-2 font-mono text-xs font-semibold tracking-[0.1em] uppercase transition",
               active === t.key
-                ? "border-cyan-500/50 bg-cyan-600/20 text-cyan-400"
-                : "border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-300",
+                ? "border-red-500/50 bg-red-500/10 text-red-400"
+                : "border-neutral-800 bg-neutral-900 text-neutral-500 hover:border-neutral-700 hover:text-neutral-400",
             ].join(" ")}
           >
             {t.label}
