@@ -1,4 +1,4 @@
-Teammembers: Zeehan Sharif, Fernando Caudillo Tafoya, Michael Rosas, Peter Nguyen
+Teamembers: Zeehan Sharif, Fernando Caudillo Tafoya, Michael Rosas, Peter Nguyen
 
 # Sparkhacks 2026 - (AEGIS) Algorithmic Evaluation & Governance Intelligence System
 
@@ -10,41 +10,42 @@ We built AEGIS because we realized AI is already making decisions that affect re
 
 ## Features
 
-- 10 narrative cases with escalating complexity and consequences
+- 5 narrative cases with escalating complexity and consequences
 - Operator metrics: throughput, deviation rate, audit heat, access level
-- Actions: Approve, Disagree, Override (with justification)
+- Actions: Approve, Challenge, Override (with justification)
 - Dynamic UI feedback: redaction, audit warnings, system messages
 - End-of-game summary and replay
 
 ## Code Structure
+
 aegis/
 ├── src/
-│ ├── app/
-│ │ ├── end/
-│ │ │ └── page.tsx ← MODIFIED: Added Decision Impact Review + Reflection
-│ │ ├── case/
-│ │ │ └── page.tsx
-│ │ ├── briefing/
-│ │ │ └── page.tsx
-│ │ ├── api/
-│ │ │ └── chat/
-│ │ ├── layout.tsx
-│ │ ├── page.tsx
-│ │ └── globals.css
-│ │
-│ ├── components/
-│ │ ├── Shell.tsx ← Used by page.tsx
-│ │ ├── Modal.tsx
-│ │ ├── Panel.tsx
-│ │ ├── TopBar.tsx
-│ │ └── eyeball.tsx
-│ │
-│ ├── data/
-│ │ ├── cases.ts ← Source data (outcomes, truthNotes)
-│ │ └── DetailedReport.md
-│ │
-│ └── state/
-│ └── operatorStore.ts ← State management (decisions store)
+│   ├── app/
+│   │   ├── end/
+│   │   │   └── page.tsx        ← MODIFIED: Added Decision Impact Review + Reflection
+│   │   ├── case/
+│   │   │   └── page.tsx
+│   │   ├── briefing/
+│   │   │   └── page.tsx
+│   │   ├── api/
+│   │   │   └── chat/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── globals.css
+│   │
+│   ├── components/
+│   │   ├── Shell.tsx           ← Used by page.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Panel.tsx
+│   │   ├── TopBar.tsx
+│   │   └── eyeball.tsx
+│   │
+│   ├── data/
+│   │   ├── cases.ts            ← Source data (outcomes, truthNotes)
+│   │   └── DetailedReport.md
+│   │
+│   └── state/
+│       └── operatorStore.ts    ← State management (decisions store)
 │
 ├── package.json
 ├── tsconfig.json
@@ -55,7 +56,6 @@ aegis/
 
 1. Install dependencies:
    ```
-   cd aegis
    npm install
    ```
 2. Start the development server:
@@ -66,8 +66,8 @@ aegis/
 
 ## Project Structure
 
-- `aegis/src/app/` — Pages and main UI
-- `aegis/src/components/` — UI components
-- `aegis/src/data/cases.ts` — Case definitions
-- `aegis/src/state/operatorStore.ts` — Global state management
+- `src/app/` — Pages and main UI
+- `src/components/` — UI components
+- cases.ts — Case definitions
+- `src/state/operatorStore.ts` — Global state management
 ---
