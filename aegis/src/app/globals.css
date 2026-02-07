@@ -18,6 +18,19 @@ body {
   font-family: var(--font-sans), sans-serif;
 }
 
+html {
+    overscroll-behavior: none;
+
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
 .glow-text {
   text-shadow: 0 0 8px currentColor;
 }

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AegisScene } from "@/components/eyeball";
+import { SmoothScroll } from "@/components/smooth-scroll";
+
 
 export default function StartPage() {
   const [loaded, setLoaded] = useState(false);
@@ -37,7 +39,7 @@ export default function StartPage() {
   }, []);
 
   return (
-    <>
+    <SmoothScroll>
       {/* Loader */}
       <div
         className={`fixed inset-0 z-[9999] bg-neutral-950 flex flex-col items-center justify-center transition-all duration-700 ${
@@ -104,12 +106,12 @@ export default function StartPage() {
               You have been granted Level 3 analyst clearance.
             </p>
           </div>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-neutral-600 pointer-events-none">
+          {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-neutral-600 pointer-events-none">
             <span className="font-mono text-[9px] tracking-[0.25em]">
               SCROLL TO PROCEED
             </span>
             <div className="w-px h-10 bg-gradient-to-b from-red-500/60 to-transparent animate-pulse" />
-          </div>
+          </div> */}
         </section>
 
         {/* Section 1 — System Overview */}
@@ -222,6 +224,6 @@ export default function StartPage() {
           </p>
         </footer> */}
       </div>
-    </>
+    </SmoothScroll>
   );
 }
