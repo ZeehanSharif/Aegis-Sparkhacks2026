@@ -341,21 +341,35 @@ export default function CaseRoomPage() {
                     DISAGREE LOGGED // CHAT {chatTurnCount}/3
                   </div>
                   {canFinalizeAfterDisagree ? (
-                  <button
-                    type="button"
-                    onClick={handleOverride}
-                    className={[
-                      "border px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] transition-all duration-150",
-                      selectedDecision === "override"
-                        ? "border-red-500/60 bg-red-500/15 text-red-300 hover:-translate-y-px hover:bg-red-500/25"
-                        : "border-red-500/35 bg-red-500/10 text-red-300/90 hover:-translate-y-px hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-200",
-                    ].join(" ")}
-                  >
-                    OVERRIDE
-                  </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleApprove}
+                        className={[
+                          "border px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] transition-all duration-150",
+                          selectedDecision === "approve"
+                            ? "border-green-500/60 bg-green-500/15 text-green-300 hover:-translate-y-px hover:bg-green-500/25"
+                            : "border-green-500/35 bg-green-500/10 text-green-300/90 hover:-translate-y-px hover:border-green-500/50 hover:bg-green-500/20 hover:text-green-200",
+                        ].join(" ")}
+                      >
+                        APPROVE FINAL
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleOverride}
+                        className={[
+                          "border px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] transition-all duration-150",
+                          selectedDecision === "override"
+                            ? "border-red-500/60 bg-red-500/15 text-red-300 hover:-translate-y-px hover:bg-red-500/25"
+                            : "border-red-500/35 bg-red-500/10 text-red-300/90 hover:-translate-y-px hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-200",
+                        ].join(" ")}
+                      >
+                        OVERRIDE
+                      </button>
+                    </>
                   ) : (
                     <div className="border border-neutral-800 px-3 py-2 font-mono text-[10px] text-neutral-600">
-                      COMPLETE 3 CHAT TURNS TO UNLOCK FINAL DECISION
+                      COMPLETE 3 CHAT TURNS TO UNLOCK APPROVE/OVERRIDE
                     </div>
                   )}
                 </>

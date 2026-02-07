@@ -4,9 +4,9 @@ AEGIS is an interactive narrative simulation built with Next.js and Tailwind CSS
 
 ## Features
 
-- 5 narrative cases with escalating complexity and consequences
+- 10 narrative cases with escalating complexity and consequences
 - Operator metrics: throughput, deviation rate, audit heat, access level
-- Actions: Approve, Challenge, Override (with justification)
+- Actions: Approve, Disagree, Override (with justification)
 - Dynamic UI feedback: redaction, audit warnings, system messages
 - End-of-game summary and replay
 
@@ -14,6 +14,7 @@ AEGIS is an interactive narrative simulation built with Next.js and Tailwind CSS
 
 1. Install dependencies:
    ```
+   cd aegis
    npm install
    ```
 2. Start the development server:
@@ -24,8 +25,8 @@ AEGIS is an interactive narrative simulation built with Next.js and Tailwind CSS
 
 ## Project Structure
 
-- `src/app/` — Pages and main UI
-- `src/components/` — UI components
-- cases.ts — Case definitions
-- `src/state/operatorStore.ts` — Global state management
+- `aegis/src/app/` — Pages and main UI
+- `aegis/src/components/` — UI components
+- `aegis/src/data/cases.ts` — Case definitions
+- `aegis/src/state/operatorStore.ts` — Global state management
 ---
