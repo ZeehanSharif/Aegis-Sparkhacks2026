@@ -8,21 +8,45 @@ import Panel from "@/components/Panel";
 import BottomTabs, { TabKey } from "@/components/BottomTabs";
 import { CASES } from "@/data/cases";
 
-type Decision = "approve" | "challenge" | "override" | null;
+type Decision = "approve" | "challenge" | "override";
+type DecisionMap = Record<string, Decision | undefined>;
 
 export default function CaseRoomPage() {
-  const c = CASES[0];
-  const [tab, setTab] = useState<TabKey>("evidence");
-  const [decision, setDecision] = useState<Decision>(null);
+  const cases = useMemo(() => CASES, []);
+  const [caseIndex, setCaseIndex] = useState(0);
+  const c = cases[caseIndex];
 
-  const impactLine =
-    decision === "approve"
-      ? c.impactPreview.approve
-      : decision === "challenge"
-        ? c.impactPreview.challenge
-        : decision === "override"
-          ? c.impactPreview.override
-          : "Select a decision to preview impact…";
+  const [tab, setTab] = useState<TabKey>("evidence");
+  const [decisionByCase, setDecisionByCase] = useState<DecisionMap>({});
+  const selectedDecision = decisionByCase[c.id];
+
+  const impactLine = selectedDecision
+    ? c.impactPreview[selectedDecision]
+    : "Select a decision to preview impact…";
+
+  const isLastCase = caseIndex === cases.length - 1;
+
+  const handlePick = (d: Decision) => {
+    setDecisionByCase((prev) => ({ ...prev, [c.id]: d }));
+  };
+
+  const continueHref = (() => {
+    // If last case, go to conclusion and pass the final case decision in query params (commit 2 will expand)
+    if (isLastCase) {
+      const d = decisionByCase[c.id] ?? "approve";
+      return `/end?case=${encodeURIComponent(c.id)}&decision=${encodeURIComponent(d)}`;
+    }
+    return "#";
+  })();
+
+  const handleContinue = () => {
+    if (!selectedDecision) return; // require a decision
+    if (!isLastCase) {
+      setCaseIndex((i) => i + 1);
+      setTab("evidence"); // reset tab each case
+    }
+    // if last case, we rely on Link navigation
+  };
 
   return (
     <Shell>
@@ -36,8 +60,14 @@ export default function CaseRoomPage() {
       />
 
       <main className="mt-5 rounded-3xl border border-neutral-300 bg-white p-4">
-        <div className="mb-4 text-xs font-bold tracking-wide text-neutral-600">
-          CASE ROOM
+        <div className="mb-4 flex items-center justify-between">
+          <div className="text-xs font-bold tracking-wide text-neutral-600">
+            CASE ROOM • {caseIndex + 1}/{cases.length}
+          </div>
+
+          <div className="text-xs text-neutral-500">
+            {isLastCase ? "Final case" : "Next case ready"}
+          </div>
         </div>
 
         {/* 2×2 panels */}
@@ -66,10 +96,10 @@ export default function CaseRoomPage() {
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => setDecision("approve")}
+                onClick={() => handlePick("approve")}
                 className={[
                   "rounded-2xl border px-3 py-3 text-sm font-bold",
-                  decision === "approve"
+                  selectedDecision === "approve"
                     ? "border-neutral-900 bg-neutral-900 text-white"
                     : "border-neutral-300 hover:bg-neutral-50",
                 ].join(" ")}
@@ -79,10 +109,10 @@ export default function CaseRoomPage() {
 
               <button
                 type="button"
-                onClick={() => setDecision("challenge")}
+                onClick={() => handlePick("challenge")}
                 className={[
                   "rounded-2xl border px-3 py-3 text-sm font-bold",
-                  decision === "challenge"
+                  selectedDecision === "challenge"
                     ? "border-neutral-900 bg-neutral-900 text-white"
                     : "border-neutral-300 hover:bg-neutral-50",
                 ].join(" ")}
@@ -92,10 +122,10 @@ export default function CaseRoomPage() {
 
               <button
                 type="button"
-                onClick={() => setDecision("override")}
+                onClick={() => handlePick("override")}
                 className={[
                   "rounded-2xl border px-3 py-3 text-sm font-bold",
-                  decision === "override"
+                  selectedDecision === "override"
                     ? "border-neutral-900 bg-neutral-900 text-white"
                     : "border-neutral-300 hover:bg-neutral-50",
                 ].join(" ")}
@@ -104,19 +134,43 @@ export default function CaseRoomPage() {
               </button>
             </div>
 
-            {/* If Approved… strip + continue */}
+            {/* If selected strip + continue */}
             <div className="mt-3 flex flex-col gap-2 rounded-2xl border border-neutral-300 bg-neutral-50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm">
                 <span className="font-bold">If selected:</span>{" "}
                 <span className="text-neutral-700">{impactLine}</span>
               </div>
 
-              <Link
-                href="/end"
-                className="inline-flex items-center justify-center rounded-xl bg-neutral-900 px-3 py-2 text-xs font-bold text-white hover:bg-neutral-800"
-              >
-                Continue →
-              </Link>
+              {!isLastCase ? (
+                <button
+                  type="button"
+                  onClick={handleContinue}
+                  disabled={!selectedDecision}
+                  className={[
+                    "inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold text-white",
+                    selectedDecision
+                      ? "bg-neutral-900 hover:bg-neutral-800"
+                      : "bg-neutral-400 cursor-not-allowed",
+                  ].join(" ")}
+                >
+                  Next Case →
+                </button>
+              ) : (
+                <Link
+                  href={continueHref}
+                  onClick={(e) => {
+                    if (!selectedDecision) e.preventDefault();
+                  }}
+                  className={[
+                    "inline-flex items-center justify-center rounded-xl px-3 py-2 text-xs font-bold text-white",
+                    selectedDecision
+                      ? "bg-neutral-900 hover:bg-neutral-800"
+                      : "bg-neutral-400 pointer-events-none",
+                  ].join(" ")}
+                >
+                  Finish →
+                </Link>
+              )}
             </div>
           </Panel>
 
@@ -142,7 +196,7 @@ export default function CaseRoomPage() {
 
             {tab === "metrics" && (
               <div className="text-neutral-700">
-                Placeholder metrics view (wire this to state next): THR/DEV/AUD.
+                Placeholder metrics view (wire this to real state next).
               </div>
             )}
 
