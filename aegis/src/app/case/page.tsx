@@ -23,12 +23,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-function auditToChip(auditHeat: number) {
-  const filled = clamp(auditHeat, 0, 3);
-  const blocks = "\u25AE".repeat(filled) + "\u25AF".repeat(3 - filled);
-  return `AUD ${blocks}`;
-}
-
 function riskBand(score: number) {
   if (score >= 80) return "Critical";
   if (score >= 65) return "High";
@@ -118,7 +112,6 @@ export default function CaseRoomPage() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const {
-    auditHeat,
     totalDecided,
     overrideCount,
     disagreementCount,
@@ -126,7 +119,6 @@ export default function CaseRoomPage() {
     overrideRate,
   } = sessionSummary;
 
-  const audChip = auditToChip(auditHeat);
   const isLastCase = activeCaseIndex === cases.length - 1;
   const casesRemaining = Math.max(cases.length - activeCaseIndex - 1, 0);
   const allCasesDecided = totalDecided >= cases.length;
@@ -206,6 +198,18 @@ export default function CaseRoomPage() {
   const canFinalizeAfterDisagree = !isChatEnabled || chatTurnCount >= 3;
   const hasDecision = Boolean(selectedDecision);
   const showDisagreeResolution = disagreeActive;
+  const topMetrics = [
+    { label: "QUEUE", value: String(casesRemaining) },
+    { label: "DECISIONS", value: String(totalDecided) },
+    {
+      label: "COMPLIANCE",
+      value: `${complianceRate}%`,
+      valueClassName: complianceRate >= 80 ? "text-green-400/80" : "text-red-400/80",
+    },
+    { label: "OVERRIDES", value: String(overrideCount), valueClassName: "text-red-400/80" },
+    { label: "OVERRIDE RATE", value: `${overrideRate}%`, valueClassName: "text-amber-300/80" },
+    { label: "CASE", value: `${activeCaseIndex + 1}/${cases.length}` },
+  ];
 
   useEffect(() => {
     const container = chatScrollRef.current;
@@ -295,18 +299,102 @@ export default function CaseRoomPage() {
         </Modal>
       )}
 
-      <TopBar
-        caseId={c.id}
-        sla={`RISK ${c.aiRiskScore}%`}
-        thr={`CMP ${complianceRate}%`}
-        dev={`OVR ${overrideCount}`}
-        aud={audChip}
-        level={`DGS ${disagreementCount}`}
-      />
+      <div className="-mx-6 -mt-6">
+        <TopBar
+          caseId={c.id}
+          subtitle={`RISK ${c.aiRiskScore}% (${riskBand(c.aiRiskScore)})`}
+          metrics={topMetrics}
+          actions={
+            <>
+              {!showDisagreeResolution && (
+                <>
+                  {selectedDecision !== "override" && (
+                    <button
+                      type="button"
+                      onClick={handleApprove}
+                      className={[
+                        "border px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] transition-all duration-150",
+                        selectedDecision === "approve"
+                          ? "border-green-500/60 bg-green-500/15 text-green-300 hover:-translate-y-px hover:bg-green-500/25"
+                          : "border-green-500/35 bg-green-500/10 text-green-300/90 hover:-translate-y-px hover:border-green-500/50 hover:bg-green-500/20 hover:text-green-200",
+                      ].join(" ")}
+                    >
+                      APPROVE
+                    </button>
+                  )}
 
-      <div className="border-b border-neutral-800 bg-neutral-950 px-4 py-2 font-mono text-xs">
-        <span className="text-neutral-700">&gt; </span>
-        <span className={systemMsgColor}>{latestSystemMessage}</span>
+                  {!hasDecision && (
+                  <button
+                    type="button"
+                    onClick={handleDisagree}
+                    className="border border-amber-500/35 bg-amber-500/10 px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] text-amber-300/90 transition-all duration-150 hover:-translate-y-px hover:border-amber-500/50 hover:bg-amber-500/20 hover:text-amber-200"
+                  >
+                    DISAGREE
+                  </button>
+                )}
+                </>
+              )}
+
+              {showDisagreeResolution && (
+                <>
+                  <div className="border border-neutral-800 bg-neutral-900/80 px-3 py-2 font-mono text-[10px] text-neutral-400">
+                    DISAGREE LOGGED // CHAT {chatTurnCount}/3
+                  </div>
+                  {canFinalizeAfterDisagree ? (
+                  <button
+                    type="button"
+                    onClick={handleOverride}
+                    className={[
+                      "border px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] transition-all duration-150",
+                      selectedDecision === "override"
+                        ? "border-red-500/60 bg-red-500/15 text-red-300 hover:-translate-y-px hover:bg-red-500/25"
+                        : "border-red-500/35 bg-red-500/10 text-red-300/90 hover:-translate-y-px hover:border-red-500/50 hover:bg-red-500/20 hover:text-red-200",
+                    ].join(" ")}
+                  >
+                    OVERRIDE
+                  </button>
+                  ) : (
+                    <div className="border border-neutral-800 px-3 py-2 font-mono text-[10px] text-neutral-600">
+                      COMPLETE 3 CHAT TURNS TO UNLOCK FINAL DECISION
+                    </div>
+                  )}
+                </>
+              )}
+
+              {hasDecision && !isLastCase && (
+              <button
+                type="button"
+                onClick={handleContinue}
+                className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-red-500/60 bg-red-600/15 px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] text-red-300 transition-all duration-150 hover:-translate-y-px hover:bg-red-600/25"
+              >
+                <span>NEXT CASE</span>
+                <span aria-hidden>&rarr;</span>
+              </button>
+            )}
+
+              {hasDecision && isLastCase && allCasesDecided && (
+              <Link
+                href="/end"
+                className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-red-500/60 bg-red-600/15 px-4 py-2 font-mono text-[10px] font-bold tracking-[0.1em] text-red-300 transition-all duration-150 hover:-translate-y-px hover:bg-red-600/25"
+              >
+                <span>END SHIFT</span>
+                <span aria-hidden>&rarr;</span>
+              </Link>
+              )}
+
+              {isLastCase && !hasDecision && (
+                <div className="border border-neutral-800 px-3 py-2 font-mono text-[10px] text-neutral-600">
+                  FINALIZE CASE TO UNLOCK CONCLUSION
+                </div>
+              )}
+            </>
+          }
+        />
+
+        <div className="border-b border-neutral-800 bg-neutral-950 px-4 py-2 font-mono text-xs">
+          <span className="text-neutral-700">&gt; </span>
+          <span className={systemMsgColor}>{latestSystemMessage}</span>
+        </div>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[320px_1fr_320px]">
@@ -541,120 +629,6 @@ export default function CaseRoomPage() {
         </div>
       </div>
 
-      <div className="sticky bottom-4 z-40 mt-4 overflow-visible border border-neutral-800 bg-neutral-950 p-4">
-        <div className="flex flex-wrap items-center justify-center gap-2 px-1 sm:gap-3">
-          {!showDisagreeResolution && (
-            <>
-              {selectedDecision !== "override" && (
-                <button
-                  type="button"
-                  onClick={handleApprove}
-                  className={[
-                    "border px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] transition",
-                    selectedDecision === "approve"
-                      ? "border-green-500/50 bg-green-500/10 text-green-400"
-                      : "border-neutral-800 text-neutral-500 hover:border-green-500/30 hover:text-green-400",
-                  ].join(" ")}
-                >
-                  APPROVE
-                </button>
-              )}
-
-              {!hasDecision && (
-                <button
-                  type="button"
-                  onClick={handleDisagree}
-                  className="border border-neutral-800 px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] text-neutral-500 transition hover:border-amber-500/30 hover:text-amber-400"
-                >
-                  DISAGREE
-                </button>
-              )}
-            </>
-          )}
-
-          {showDisagreeResolution && (
-            <>
-              <div className="border border-neutral-800 bg-neutral-900/80 px-4 py-3 font-mono text-xs text-neutral-400">
-                DISAGREE LOGGED // CHAT TURNS {chatTurnCount}/3
-              </div>
-              {!canFinalizeAfterDisagree ? (
-                <div className="border border-neutral-800 px-4 py-3 font-mono text-xs text-neutral-600">
-                  COMPLETE 3 CHAT TURNS TO UNLOCK FINAL DECISION
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleOverride}
-                  className={[
-                    "border px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] transition",
-                    selectedDecision === "override"
-                      ? "border-red-500/50 bg-red-500/10 text-red-400"
-                      : "border-neutral-800 text-neutral-500 hover:border-red-500/30 hover:text-red-400",
-                  ].join(" ")}
-                >
-                  OVERRIDE
-                </button>
-              )}
-            </>
-          )}
-
-          {hasDecision && !isLastCase && (
-            <button
-              type="button"
-              onClick={handleContinue}
-              className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-red-500/50 bg-red-600/10 px-6 py-3 font-mono text-xs font-bold tracking-[0.1em] text-red-400 transition-colors hover:bg-red-600/20"
-            >
-              <span>NEXT CASE</span>
-              <span aria-hidden>&rarr;</span>
-            </button>
-          )}
-
-          {hasDecision && isLastCase && allCasesDecided && (
-            <Link
-              href="/end"
-              className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap border border-red-500/50 bg-red-600/10 px-6 py-3 font-mono text-xs font-bold tracking-[0.15em] text-red-400 transition-colors hover:bg-red-600/20"
-            >
-              <span>END SHIFT</span>
-              <span aria-hidden>&rarr;</span>
-            </Link>
-          )}
-        </div>
-
-        {isLastCase && !hasDecision && (
-          <div className="mt-3 text-center font-mono text-[10px] tracking-[0.1em] text-neutral-600">
-            FINALIZE THIS CASE TO UNLOCK SESSION CONCLUSION
-          </div>
-        )}
-
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-4 font-mono text-[10px] tracking-[0.1em] text-neutral-600">
-          <span>
-            QUEUE: <span className="text-neutral-400">{casesRemaining}</span>
-          </span>
-          <span className="text-neutral-800">|</span>
-          <span>
-            DECISIONS: <span className="text-neutral-400">{totalDecided}</span>
-          </span>
-          <span className="text-neutral-800">|</span>
-          <span>
-            COMPLIANCE:{" "}
-            <span className={complianceRate >= 80 ? "text-green-400/70" : "text-red-400/70"}>
-              {complianceRate}%
-            </span>
-          </span>
-          <span className="text-neutral-800">|</span>
-          <span>
-            OVERRIDES: <span className="text-red-400/70">{overrideCount}</span>
-          </span>
-          <span className="text-neutral-800">|</span>
-          <span>
-            OVERRIDE RATE: <span className="text-amber-300/70">{overrideRate}%</span>
-          </span>
-          <span className="text-neutral-800">|</span>
-          <span>
-            CASE {activeCaseIndex + 1}/{cases.length}
-          </span>
-        </div>
-      </div>
     </Shell>
   );
 }
