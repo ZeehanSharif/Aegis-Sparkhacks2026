@@ -11,7 +11,7 @@ import { CASES } from "@/data/cases";
 type Decision = "approve" | "challenge" | "override" | null;
 
 export default function CaseRoomPage() {
-  const c = useMemo(() => CASES[0], []);
+  const c = CASES[0];
   const [tab, setTab] = useState<TabKey>("evidence");
   const [decision, setDecision] = useState<Decision>(null);
 
