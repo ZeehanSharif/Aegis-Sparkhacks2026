@@ -1,6 +1,6 @@
 Teammembers: Zeehan Sharif, Fernando Caudillo Tafoya, Michael Rosas, Peter Nguyen
 
-# Sparkhacks 2026 - AEGIS — Algorithmic Evaluation & Governance Intelligence System
+# Sparkhacks 2026 - (AEGIS) Algorithmic Evaluation & Governance Intelligence System
 
 AEGIS is an interactive narrative simulation built with Next.js and Tailwind CSS. You play an analyst inside a state-scale decision engine, processing cases and ratifying AI recommendations. Your actions shape both citizen outcomes and your own operator profile, with escalating tension between compliance, audit risk, and moral intervention.
 
