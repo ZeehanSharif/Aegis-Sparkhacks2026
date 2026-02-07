@@ -458,7 +458,7 @@ export default function CaseRoomPage() {
               </div>
               {impactLine && (
                 <div className="border-t border-neutral-800 pt-3">
-                  <span className="text-neutral-600">Projected impact:</span>{" "}
+                  <span className="text-neutral-600">Outcome:</span>{" "}
                   <span className="text-amber-300/90">{impactLine}</span>
                 </div>
               )}
