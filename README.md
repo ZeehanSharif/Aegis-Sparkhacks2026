@@ -6,7 +6,7 @@ AEGIS is an interactive narrative simulation built with Next.js and Tailwind CSS
 
 ## Why we chose it
 
-We built AEGIS because we realized AI is already making decisions that affect real people's lives—loan denials, flagged accounts, detention orders—but we never see the actual human cost of getting it wrong. So we created a simulator where you have to decide: do you trust the algorithm or override it? We wanted to make the invisible visible, to show that every choice ripples outward, and that neither approving nor rejecting the AI protects you from consequences. The Decision Impact Review at the end is the gut-punch—it forces you to face what your decisions actually meant to Elena, to Rashid, to all these people, reminding you that nuance isn't weakness, it's the only honest way to think about power.
+We built AEGIS because we realized AI is already making decisions that affect real people's lives—loan denials, flagged accounts, detention orders, but we never see the actual human cost of getting it wrong. So we created a simulator where you have to decide: do you trust the algorithm or override it? We wanted to make the invisible visible, to show that every choice ripples outward, and that neither approving nor rejecting the AI protects you from consequences. The Decision Impact Review at the end is the gut-punch—it forces you to face what your decisions actually meant to Elena, to Rashid, to all these people, reminding you that nuance isn't weakness, it's the only honest way to think about power.
 
 ## Features
 
