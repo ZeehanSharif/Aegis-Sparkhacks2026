@@ -34,18 +34,18 @@ aegis/
 │   │   └── globals.css
 │   │
 │   ├── components/
-│   │   ├── Shell.tsx           ← Used by page.tsx
+│   │   ├── Shell.tsx
 │   │   ├── Modal.tsx
 │   │   ├── Panel.tsx
 │   │   ├── TopBar.tsx
 │   │   └── eyeball.tsx
 │   │
 │   ├── data/
-│   │   ├── cases.ts            ← Source data (outcomes, truthNotes)
+│   │   ├── cases.ts
 │   │   └── DetailedReport.md
 │   │
 │   └── state/
-│       └── operatorStore.ts    ← State management (decisions store)
+│       └── operatorStore.ts
 │
 ├── package.json
 ├── tsconfig.json
