@@ -3,17 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Shell from "@/components/Shell";
-import { CASES } from "@/data/cases";
-import { useOperatorStore } from "@/state/operatorStore";
 
 const BRIEFING_LINES = [
-<<<<<<< HEAD
-  "Welcome, Analyst. Clearance: Level 3.",
-  `Your shift queue contains ${CASES.length} cases for review.`,
-  "Each case has been pre-evaluated by AEGIS's predictive assessment engine.",
-  "Your role is to review and action each recommendation.",
-  "Compliance rate is monitored for quality assurance purposes.",
-=======
   "Welcome, Analyst.",
   "You will review cases flagged by AEGIS and make final judgments.",
   "",
@@ -22,35 +13,10 @@ const BRIEFING_LINES = [
   "Then approve or reject the recommendation.",
   "",
   "Your shift begins now.",
->>>>>>> 11cd06f (revamp briefing page)
 ];
 
 export default function BriefingPage() {
   const [visibleLines, setVisibleLines] = useState(0);
-<<<<<<< HEAD
-  const resetOperatorSession = useOperatorStore((state) => state.reset);
-  const done = visibleLines >= BRIEFING_LINES.length;
-
-  const lines = useMemo(() => BRIEFING_LINES.slice(0, visibleLines), [visibleLines]);
-
-  useEffect(() => {
-    resetOperatorSession();
-  }, [resetOperatorSession]);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setVisibleLines((current) => {
-        if (current >= BRIEFING_LINES.length) {
-          window.clearInterval(timer);
-          return current;
-        }
-        return current + 1;
-      });
-    }, 800);
-
-    return () => window.clearInterval(timer);
-  }, []);
-=======
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
@@ -68,7 +34,6 @@ export default function BriefingPage() {
       return () => clearTimeout(buttonTimer);
     }
   }, [visibleLines]);
->>>>>>> 11cd06f (revamp briefing page)
 
   return (
     <Shell>
@@ -119,7 +84,7 @@ export default function BriefingPage() {
 
           {/* Footer indicator */}
           {showButton && (
-            <div className="mt-6 pt-4 border-t border-neutral-800/50 animate-[fadeIn_0.8s_ease-out_0.3s_forwards] opacity-0">
+            <div className="mt-6 pt-4 border-t border-neutral-800/50 animate-[fadeIn_1s_ease-out_1s_forwards] opacity-0">
               <div className="flex items-center justify-center gap-3 font-mono text-[9px] text-neutral-600 tracking-[0.2em] uppercase">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500/70 animate-pulse" />
                 Session Monitored
